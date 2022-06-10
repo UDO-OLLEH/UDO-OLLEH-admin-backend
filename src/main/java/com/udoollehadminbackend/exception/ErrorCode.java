@@ -5,7 +5,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_001", " AUTHENTICATION_FAILED.");
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_001", " AUTHENTICATION_FAILED."),
+    AUTHENTICATION_CONFLICT(HttpStatus.CONFLICT,"AUTH__009"," AUTHENTICATION_CONFLICT."),
+    NOT_ROOT_ADMIN(HttpStatus.FORBIDDEN, "AUTH005", "NOT_ROOT_ADMIN.");
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
