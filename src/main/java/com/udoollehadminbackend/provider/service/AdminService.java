@@ -4,6 +4,7 @@ import com.udoollehadminbackend.core.security.RootAuth;
 import com.udoollehadminbackend.core.security.role.Role;
 import com.udoollehadminbackend.core.service.AdminServiceInterface;
 import com.udoollehadminbackend.entity.Admin;
+import com.udoollehadminbackend.exception.errors.CustomJwtRuntimeException;
 import com.udoollehadminbackend.exception.errors.LoginFailedException;
 import com.udoollehadminbackend.exception.errors.RegisterFailedException;
 import com.udoollehadminbackend.provider.security.JwtAuthToken;
@@ -102,5 +103,34 @@ public class AdminService implements AdminServiceInterface {
         //토큰 발급
         JwtAuthToken refreshToken = jwtAuthTokenProvider.createAuthToken(userid, Role.ADMIN.getCode(),expiredDate);
         return refreshToken.getToken();
+    }
+
+    @Transactional
+    @Override
+    public Optional<ResponseAdmin.token> updateAccessToken(String refreshToken){
+        if(refreshToken == null || refreshToken.equals("null")){
+            throw new CustomJwtRuntimeException();
+        }
+        Admin admin = adminRepository.findByRefreshToken(refreshToken);
+        if(admin == null){
+            throw new CustomJwtRuntimeException();
+        }
+        if(!admin.getRefreshToken().equals(refreshToken)){
+            throw new CustomJwtRuntimeException();
+        }
+        //토큰 유효 검증
+        JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(refreshToken);
+        if(!jwtAuthToken.validate() || !jwtAuthToken.getClaims().get("role").equals(Role.ADMIN.getCode())){
+            return Optional.empty(); //유효하지 않으면
+        }
+
+        String id = String.valueOf(jwtAuthToken.getClaims().getSubject());
+        String accessToken = createAccessToken(id); //accessToken 재발급
+
+        ResponseAdmin.token newToken = ResponseAdmin.token.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+        return Optional.ofNullable(newToken);
     }
 }

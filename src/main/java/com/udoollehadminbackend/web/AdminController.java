@@ -1,5 +1,6 @@
 package com.udoollehadminbackend.web;
 
+import com.udoollehadminbackend.exception.errors.CustomJwtRuntimeException;
 import com.udoollehadminbackend.exception.errors.LoginFailedException;
 import com.udoollehadminbackend.exception.errors.NotRootAdminException;
 import com.udoollehadminbackend.provider.security.JwtAuthToken;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -53,4 +55,16 @@ public class AdminController {
                 .list(token)
                 .build(), HttpStatus.OK);
     }
+
+    @PostMapping("/admin/update/accessToken")
+    public ResponseEntity<ResponseMessage> updateAccessToken(@RequestBody Map<String, String> refreshToken){
+        ResponseAdmin.token token = adminService.updateAccessToken(refreshToken.get("refreshToken")).orElseThrow(()-> new CustomJwtRuntimeException());
+
+        return new ResponseEntity<>(ResponseMessage.builder()
+                .status(HttpStatus.OK.value())
+                .message("accessToken 갱신 성공")
+                .list(token)
+                .build(), HttpStatus.OK);
+    }
+
 }
