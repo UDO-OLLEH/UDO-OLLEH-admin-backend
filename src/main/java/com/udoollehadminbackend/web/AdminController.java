@@ -1,12 +1,13 @@
 package com.udoollehadminbackend.web;
 
-import com.udoollehadminbackend.entity.Admin;
 import com.udoollehadminbackend.exception.errors.CustomJwtRuntimeException;
+import com.udoollehadminbackend.exception.errors.LoginFailedException;
 import com.udoollehadminbackend.exception.errors.NotRootAdminException;
 import com.udoollehadminbackend.provider.security.JwtAuthToken;
 import com.udoollehadminbackend.provider.security.JwtAuthTokenProvider;
 import com.udoollehadminbackend.provider.service.AdminService;
 import com.udoollehadminbackend.web.dto.RequestAdmin;
+import com.udoollehadminbackend.web.dto.ResponseAdmin;
 import com.udoollehadminbackend.web.dto.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -40,7 +42,28 @@ public class AdminController {
 
         return new ResponseEntity<>(ResponseMessage.builder()
                 .status(HttpStatus.OK.value())
-                .message("성공")
+                .message("관리자 등록 성공")
+                .build(), HttpStatus.OK);
+    }
+    @PostMapping("/admin/login")
+    public ResponseEntity<ResponseMessage> login(@Valid @RequestBody RequestAdmin.adminInfo requestDto){
+        ResponseAdmin.token token = adminService.login(requestDto).orElseThrow(()-> new LoginFailedException());
+
+        return new ResponseEntity<>(ResponseMessage.builder()
+                .status(HttpStatus.OK.value())
+                .message("로그인 성공")
+                .list(token)
+                .build(), HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/update/accessToken")
+    public ResponseEntity<ResponseMessage> updateAccessToken(@RequestBody Map<String, String> refreshToken){
+        ResponseAdmin.token token = adminService.updateAccessToken(refreshToken.get("refreshToken")).orElseThrow(()-> new CustomJwtRuntimeException());
+
+        return new ResponseEntity<>(ResponseMessage.builder()
+                .status(HttpStatus.OK.value())
+                .message("accessToken 갱신 성공")
+                .list(token)
                 .build(), HttpStatus.OK);
     }
 
