@@ -29,4 +29,18 @@ public class AdminServiceTests {
         adminService.register(requestDto);
         assertNotNull(adminRepository.findByEmail(requestDto.getEmail()));
     }
-}
+
+    @Test
+    @DisplayName("로그인 테스트")
+    @Transactional
+    void loginTest() {
+        RequestAdmin.adminInfo requestDto = RequestAdmin.adminInfo.builder()
+                .email("test")
+                .password("1234")
+                .build();
+        adminService.register(requestDto);
+        //로그인
+        assertNotNull(adminService.login(requestDto).orElseGet(()->null));
+    }
+
+    }

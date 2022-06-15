@@ -1,8 +1,6 @@
 package com.udoollehadminbackend.exception;
 
-import com.udoollehadminbackend.exception.errors.CustomJwtRuntimeException;
-import com.udoollehadminbackend.exception.errors.NotRootAdminException;
-import com.udoollehadminbackend.exception.errors.RegisterFailedException;
+import com.udoollehadminbackend.exception.errors.*;
 import com.udoollehadminbackend.web.dto.ResponseMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,6 +34,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotRootAdminException.class)
     protected ResponseEntity<ResponseMessage> handleNotRootAdminException(NotRootAdminException e){
         ErrorCode code = ErrorCode.NOT_ROOT_ADMIN;
+
+        ResponseMessage response = ResponseMessage.builder()
+                .status(code.getHttpStatus().value())
+                .message(code.getMessage())
+                .list(code.getCode())
+                .build();
+        return new ResponseEntity<>(response, code.getHttpStatus());
+    }
+
+    @ExceptionHandler(LoginFailedException.class)
+    protected ResponseEntity<ResponseMessage> handleLoginFailedException(LoginFailedException e){
+        ErrorCode code = ErrorCode.LOGIN_FAILED;
 
         ResponseMessage response = ResponseMessage.builder()
                 .status(code.getHttpStatus().value())
