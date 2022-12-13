@@ -6,7 +6,7 @@ import lombok.Data;
 public class ResponseAdmin {
     @Builder
     @Data
-    public static class token{
+    public static class TokenDto{
         private String accessToken;
         private String refreshToken;
     }

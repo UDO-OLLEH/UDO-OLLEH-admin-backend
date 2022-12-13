@@ -10,8 +10,10 @@ import com.udoollehadminbackend.web.dto.RequestAdmin;
 import com.udoollehadminbackend.web.dto.ResponseAdmin;
 import com.udoollehadminbackend.web.dto.ResponseMessage;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +30,7 @@ public class AdminController {
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
 
     @PostMapping("/admin/register")
-    public ResponseEntity<ResponseMessage> requestRegister(@Valid @RequestBody RequestAdmin.adminInfo registerDto, HttpServletRequest request){
+    public ResponseEntity<ResponseMessage> requestRegister(@Valid @RequestBody RequestAdmin.AdminInfoDto registerDto, HttpServletRequest request){
         Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
         String email = null;
         if(token.isPresent()){
@@ -41,16 +43,14 @@ public class AdminController {
         }else throw new NotRootAdminException();
 
         return new ResponseEntity<>(ResponseMessage.builder()
-                .status(HttpStatus.OK.value())
                 .message("관리자 등록 성공")
                 .build(), HttpStatus.OK);
     }
     @PostMapping("/admin/login")
-    public ResponseEntity<ResponseMessage> login(@Valid @RequestBody RequestAdmin.adminInfo requestDto){
-        ResponseAdmin.token token = adminService.login(requestDto).orElseThrow(()-> new LoginFailedException());
+    public ResponseEntity<ResponseMessage> login(@Valid @RequestBody RequestAdmin.AdminInfoDto requestDto){
+        ResponseAdmin.TokenDto token = adminService.login(requestDto).orElseThrow(()-> new LoginFailedException());
 
         return new ResponseEntity<>(ResponseMessage.builder()
-                .status(HttpStatus.OK.value())
                 .message("로그인 성공")
                 .list(token)
                 .build(), HttpStatus.OK);
@@ -58,13 +58,22 @@ public class AdminController {
 
     @PostMapping("/admin/update/accessToken")
     public ResponseEntity<ResponseMessage> updateAccessToken(@RequestBody Map<String, String> refreshToken){
-        ResponseAdmin.token token = adminService.updateAccessToken(refreshToken.get("refreshToken")).orElseThrow(()-> new CustomJwtRuntimeException());
+        ResponseAdmin.TokenDto token = adminService.updateAccessToken(refreshToken.get("refreshToken")).orElseThrow(()-> new CustomJwtRuntimeException());
 
         return new ResponseEntity<>(ResponseMessage.builder()
-                .status(HttpStatus.OK.value())
                 .message("accessToken 갱신 성공")
                 .list(token)
                 .build(), HttpStatus.OK);
     }
 
+    @GetMapping("/admin/valid/accessToken")
+    public ResponseEntity<ResponseMessage> validAccessToken(HttpServletRequest request) {
+        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        if(!adminService.validAdminAccessToken(token.orElseThrow(() -> new CustomJwtRuntimeException()))){
+            throw new CustomJwtRuntimeException();
+        }
+        return new ResponseEntity<>(ResponseMessage.builder()
+                .message("유효한 토큰입니다.")
+                .build(), HttpStatus.OK);
+    }
 }

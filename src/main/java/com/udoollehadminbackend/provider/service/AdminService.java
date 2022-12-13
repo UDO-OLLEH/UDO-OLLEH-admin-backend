@@ -34,7 +34,7 @@ public class AdminService implements AdminServiceInterface {
     public void init(){
         //루트 관리자 등록
         try {
-            register(RequestAdmin.adminInfo.builder()
+            register(RequestAdmin.AdminInfoDto.builder()
                     .email(rootAuth.getId())
                     .password(rootAuth.getPassword())
                     .build());
@@ -45,7 +45,7 @@ public class AdminService implements AdminServiceInterface {
 
     @Transactional
     @Override
-    public void register(RequestAdmin.adminInfo registerDto){
+    public void register(RequestAdmin.AdminInfoDto registerDto){
         Admin admin = adminRepository.findByEmail(registerDto.getEmail());
         if(admin != null){
             throw new RegisterFailedException();
@@ -67,7 +67,7 @@ public class AdminService implements AdminServiceInterface {
 
     @Override
     @Transactional
-    public Optional<ResponseAdmin.token> login(RequestAdmin.adminInfo requestDto){
+    public Optional<ResponseAdmin.TokenDto> login(RequestAdmin.AdminInfoDto requestDto){
         Admin admin = adminRepository.findByEmail(requestDto.getEmail());
         if(admin == null){
             throw new LoginFailedException();
@@ -79,7 +79,7 @@ public class AdminService implements AdminServiceInterface {
         }
         //로그인 성공
         String refreshToken = createRefreshToken(requestDto.getEmail());
-        ResponseAdmin.token response = ResponseAdmin.token.builder()
+        ResponseAdmin.TokenDto response = ResponseAdmin.TokenDto.builder()
                 .accessToken(createAccessToken(admin.getEmail()))
                 .refreshToken(refreshToken)
                 .build();
@@ -107,7 +107,7 @@ public class AdminService implements AdminServiceInterface {
 
     @Transactional
     @Override
-    public Optional<ResponseAdmin.token> updateAccessToken(String refreshToken){
+    public Optional<ResponseAdmin.TokenDto> updateAccessToken(String refreshToken){
         if(refreshToken == null || refreshToken.equals("null")){
             throw new CustomJwtRuntimeException();
         }
@@ -127,10 +127,27 @@ public class AdminService implements AdminServiceInterface {
         String id = String.valueOf(jwtAuthToken.getClaims().getSubject());
         String accessToken = createAccessToken(id); //accessToken 재발급
 
-        ResponseAdmin.token newToken = ResponseAdmin.token.builder()
+        ResponseAdmin.TokenDto newToken = ResponseAdmin.TokenDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
         return Optional.ofNullable(newToken);
+    }
+
+    @Override
+    public boolean validAdminAccessToken(String token) {
+        if (token != null) {
+            //토큰이 있으면
+            System.out.println("토큰이 있으면");
+            //토큰 유효 검증
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token);
+            if (jwtAuthToken.validate() && jwtAuthToken.getClaims().get("role").equals(Role.ADMIN.getCode())) {
+                //유효하고, 관리자면
+                System.out.println("유효하고, 관리자라면");
+                return true;
+            }
+        }
+        System.out.println("토큰 없음");
+        return false;
     }
 }

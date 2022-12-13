@@ -6,10 +6,11 @@ import com.udoollehadminbackend.web.dto.ResponseAdmin;
 import java.util.Optional;
 
 public interface AdminServiceInterface {
-    void register(RequestAdmin.adminInfo registerDto);
+    void register(RequestAdmin.AdminInfoDto registerDto);
     Boolean isRootAdmin(String email);
-    Optional<ResponseAdmin.token> login(RequestAdmin.adminInfo requestDto);
-    Optional<ResponseAdmin.token> updateAccessToken(String token);
+    Optional<ResponseAdmin.TokenDto> login(RequestAdmin.AdminInfoDto requestDto);
+    Optional<ResponseAdmin.TokenDto> updateAccessToken(String refreshToken);
     String createAccessToken(String userid);
     String createRefreshToken(String userid);
+    boolean validAdminAccessToken(String token);
 }

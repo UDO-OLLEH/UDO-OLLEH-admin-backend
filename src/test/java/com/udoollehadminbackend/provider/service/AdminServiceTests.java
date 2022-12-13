@@ -24,7 +24,7 @@ public class AdminServiceTests {
     @DisplayName("회원가입 테스트")
     @Transactional
     void registerTest(){
-        RequestAdmin.adminInfo requestDto = RequestAdmin.adminInfo.builder()
+        RequestAdmin.AdminInfoDto requestDto = RequestAdmin.AdminInfoDto.builder()
                 .email("test")
                 .password("1234")
                 .build();
@@ -36,7 +36,7 @@ public class AdminServiceTests {
     @DisplayName("로그인 테스트")
     @Transactional
     void loginTest() {
-        RequestAdmin.adminInfo requestDto = RequestAdmin.adminInfo.builder()
+        RequestAdmin.AdminInfoDto requestDto = RequestAdmin.AdminInfoDto.builder()
                 .email("test")
                 .password("1234")
                 .build();
@@ -49,13 +49,13 @@ public class AdminServiceTests {
     @Transactional
     void updateAccessTokenTest(){
 
-        RequestAdmin.adminInfo requestDto = RequestAdmin.adminInfo.builder()
+        RequestAdmin.AdminInfoDto requestDto = RequestAdmin.AdminInfoDto.builder()
                 .email("test")
                 .password("1234")
                 .build();
         adminService.register(requestDto);
-        ResponseAdmin.token token = adminService.login(requestDto).orElseGet(()->null);
-        ResponseAdmin.token newToken = adminService.updateAccessToken(token.getRefreshToken()).orElseGet(()-> null);
+        ResponseAdmin.TokenDto token = adminService.login(requestDto).orElseGet(()->null);
+        ResponseAdmin.TokenDto newToken = adminService.updateAccessToken(token.getRefreshToken()).orElseGet(()-> null);
         assertNotNull(newToken);
     }
 }

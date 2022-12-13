@@ -13,7 +13,6 @@ public class GlobalExceptionHandler {
         ErrorCode code = ErrorCode.AUTHENTICATION_FAILED;
 
         ResponseMessage response = ResponseMessage.builder()
-                .status(code.getHttpStatus().value())
                 .message(code.getMessage())
                 .list(code.getCode())
                 .build();
@@ -24,7 +23,6 @@ public class GlobalExceptionHandler {
         ErrorCode code = ErrorCode.AUTHENTICATION_CONFLICT;
 
         ResponseMessage response = ResponseMessage.builder()
-                .status(code.getHttpStatus().value())
                 .message(code.getMessage())
                 .list(code.getCode())
                 .build();
@@ -36,7 +34,6 @@ public class GlobalExceptionHandler {
         ErrorCode code = ErrorCode.NOT_ROOT_ADMIN;
 
         ResponseMessage response = ResponseMessage.builder()
-                .status(code.getHttpStatus().value())
                 .message(code.getMessage())
                 .list(code.getCode())
                 .build();
@@ -48,7 +45,6 @@ public class GlobalExceptionHandler {
         ErrorCode code = ErrorCode.LOGIN_FAILED;
 
         ResponseMessage response = ResponseMessage.builder()
-                .status(code.getHttpStatus().value())
                 .message(code.getMessage())
                 .list(code.getCode())
                 .build();

@@ -83,6 +83,23 @@
 			<version>0.11.2</version>
 			<scope>runtime</scope>
 		</dependency>
+		<!-- mysql 연결 -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<!-- flyway 의존성 추가 -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>8.4.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
+			<version>8.4.4</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
